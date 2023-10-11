@@ -1,5 +1,5 @@
 const Token = require('../Models/Token');
-const { UnAuthenticatedError, NotAuthorizedError } = require('../Errors');
+const CustomError = require('../Errors/index.js');
 const { isTokenValid, AttachCookiesToResponse } = require('../Utils');
 
 const IsItAuthenticatedMiddleware = async (req, res, next) => {
@@ -18,7 +18,7 @@ const IsItAuthenticatedMiddleware = async (req, res, next) => {
     });
 
     if (!ExistingToken || !ExistingToken?.isValid) {
-      throw new UnAuthenticatedError('UnAuthenticated');
+      throw new CustomError.UnAuthenticatedError('UnAuthenticated');
     }
     AttachCookiesToResponse({
       res,
@@ -29,14 +29,16 @@ const IsItAuthenticatedMiddleware = async (req, res, next) => {
     req.user = payload.user;
     next();
   } catch (e) {
-    throw new UnAuthenticatedError('UnAuthenticated');
+    throw new CustomError.UnAuthenticatedError('UnAuthenticated');
   }
 };
 
 const AuthorizePermissionsMiddleware = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      throw new NotAuthorizedError('Unauthorized to access this route');
+      throw new CustomError.NotAuthorizedError(
+        'Unauthorized to access this route'
+      );
     }
     next();
   };
