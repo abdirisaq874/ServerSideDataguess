@@ -1,7 +1,6 @@
-const {NotFoundError} = require('../Errors');
+const NotFoundError = require('./../Errors/NotFoundError');
 
 const NotFoundMiddleware = (req, res) => {
-  console.log('Route does not exist');
   throw new NotFoundError('Route does not exist');
 };
 
