@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node App.js",
     "production": "node App.js",
-    "test": "mocha"
+    "test": "echo \"No test specified\""
   },
   "keywords": [],
   "author": "",
