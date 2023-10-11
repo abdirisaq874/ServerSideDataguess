@@ -1,9 +1,8 @@
 const crypto = require('crypto');
 const { StatusCodes } = require('http-status-codes');
 const users = require('../Models/Users');
-const BadRequestError = require('../Errors/BadRequestError');
-const UnAuthenticatedError = require('../Errors/UnAuthenticatedError');
-const NotFoundError = require('../Errors/NotFoundError');
+const CustomErrors = require('../Errors');
+const RolesEnum = require('../Constants/Roles');
 const Utils = require('../Utils');
 const createTokenUser = require('../Utils/JWT/CreateTokenUser');
 const Token = require('../Models/Token');
@@ -14,7 +13,9 @@ const RegisterUser = async (req, res) => {
   // check if the user is already registered
   const emailAlreadyExists = await users.findOne({ Email });
   if (emailAlreadyExists) {
-    throw new BadRequestError(`Already registered with email ${Email}`);
+    throw new CustomErrors.BadRequestError(
+      `Already registered with email ${Email}`
+    );
   }
 
   // Create User and register it
@@ -38,11 +39,11 @@ const GetUserById = async (req, res) => {
   try {
     const user = await users.findOne({ _id: userId });
     if (!user) {
-      throw new NotFoundError(`No user with id : ${userId}`);
+      throw new CustomErrors.NotFoundError(`No user with id : ${userId}`);
     }
     res.status(StatusCodes.OK).send(user);
   } catch (error) {
-    throw new NotFoundError(`No user with id : ${userId}`);
+    throw new CustomErrors.NotFoundError(`No user with id : ${userId}`);
   }
 };
 
@@ -52,11 +53,11 @@ const SignInUser = async (req, res) => {
   const user = await users.findOne({ Email, Role: Role });
 
   if (!user) {
-    throw new UnAuthenticatedError('invalid credentials');
+    throw new CustomErrors.UnAuthenticatedError('invalid credentials');
   }
   const isPasswordCorrect = await user.comparePassword(Password);
   if (!isPasswordCorrect) {
-    throw new UnAuthenticatedError('invalid credentials');
+    throw new CustomErrors.UnAuthenticatedError('invalid credentials');
   }
 
   const tokenUser = createTokenUser(user);
@@ -69,7 +70,7 @@ const SignInUser = async (req, res) => {
   if (existingToken) {
     const { isValid } = existingToken;
     if (!isValid) {
-      throw new UnAuthenticatedError('Invalid Credentials');
+      throw new CustomErrors.UnAuthenticatedError('Invalid Credentials');
     }
     refreshToken = existingToken.refreshToken;
     Utils.AttachCookiesToResponse({ res, user: tokenUser, refreshToken });

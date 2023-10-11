@@ -1,6 +1,5 @@
 const products = require('../Models/Products');
-const BadRequestError = require('../Errors/BadRequestError');
-const NotFoundError = require('../Errors/NotFoundError');
+const CustomError = require('../Errors');
 const FetchProducts = async (req, res) => {
   // const sanitizedQueryParams = await this.sanitizeQuery(req.params);
   const {
@@ -108,11 +107,11 @@ const FetchProduct = async (req, res) => {
   const { id: productId } = req.params;
   //check if the id is numeric
   if (isNaN(productId)) {
-    throw new BadRequestError('Invalid product id');
+    throw new CustomError.BadRequestError('Invalid product id');
   }
   const product = await products.findOne({ id: productId });
   if (!product) {
-    throw new NotFoundError(`No product with id : ${productId}`);
+    throw new CustomError.NotFoundError(`No product with id : ${productId}`);
   }
 
   const data = {
