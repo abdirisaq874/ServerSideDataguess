@@ -1,4 +1,4 @@
-const { ValidationError } = require('../Errors');
+const ValidationError = require('../Errors/ValidationError');
 
 const ValidationMiddlware = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body);
